@@ -12,12 +12,13 @@ The JWS spcification states that only the key alg is compulsory. There are many 
 						
 - x5c : X.509 Certificate Chain : is sometimes used to pass the X.509 public key certificate or certificate chain of the key that was used to sign the JWT. It can be used to inject self-signed certificates. The complexity of the x.509 format along with its extentions means that vulnerabilities arise. 
   
-  More info :  https://talosintelligence.com/vulnerability_reports/TALOS-2017-0293 &&  https://mbechler.github.io/2018/01/20/Java-CVE-2018-2633
+  More info about the exploiting _cty_ and _x5c_ :  https://talosintelligence.com/vulnerability_reports/TALOS-2017-0293 &&  https://mbechler.github.io/2018/01/20/Java-CVE-2018-2633
+			
+
 			
 			
 			
-			
-### Using the jwk paramter to inject self-signed JWTs
+### Using the _jwk_ paramter to inject self-signed JWTs
 **Caused by** : Server misconfiguration
 				
 **Concept**  : The JWS Specification allows a jwk header parameter that a server can use to embed its public key (usaully shared so that anyone can verify the tokens issued by the server)  directly into the token itself using the JWK format. 
@@ -28,7 +29,7 @@ Steps
 
 - Generate a new RSA key
 - Modify the tokens payload as required
-- “Attack” > “Embedded JWK” & send to see how server responds. 
+- “Attack” > “Embedded JWK” & send to see if the token is vulnerable. 
 							
 							
 **Redemidiation** : The best practice is to have a whitelist of public keys that a server can use in order to verify JWT signatures. 		
@@ -38,7 +39,7 @@ Steps
 							
 							
 							
-### Using the jku paramter to inject self-signed JWTs
+### Using the _jku_ paramter to inject self-signed JWTs
 					
 The jku key can be used to reference by URL a JWK Set that contains the keys. The relevant key is fetched by the server when verifying the signature.  JWK Sets can be exposed publicly at endpoints such as /.well-known/jwks.json 
 					
@@ -64,7 +65,7 @@ What this attack looks like :
 									
 1. With a request that contains a JWT, have the arbitray parameters / URL set. 
 2. Generate a new RSA key using the JWT Editor extension. 					 
-3. On a server you own, have page set to a key set - [e.g https://mydomain/keys.json ] May have the below format
+3. On a server you own, have the page/file set to a key set - [e.g https://mydomain/keys.json ] May have the below format
 											
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -84,6 +85,7 @@ What this attack looks like :
         }
     ]
 }
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 											
@@ -100,29 +102,33 @@ Why it works : the server does not verrify that your domain is a trusted source.
 					
 					
 
-### Using the kid paramter to inject self-signed JWTs
+### Using the _kid_ paramter to inject self-signed JWTs
 
-**Caused by** : combination of loose paramater constraints (specifications ) and developers actions 
+**Caused by** : combination of loose paramater constraints (specifications) and developers actions 
 
 **Concept**
 					
 Due to servers using cryptograohic keys to sign different types of data - not only JWTs - the _kid_, Key Identifier is used to aid the server in identifying which key to use when a signature is being verified. Verification keys are often stored as a JWK Set. As a result, the server will look for the JWK (JSON Web Key) that shares  the value of the kid with the token. The structure of the value of the key kid is not well defined in the JWS specification and therefore the value can be anything that the developer chooses; can even point to a file within the database or a file name.
 					
-	 > If the key kid points to a file, it can introduce vulnerabilities such as directory traversal. I can force the server to use a different file to verify the key. If a symmetric algorithm is used to sign JWTs, this dangerous due to the ability to point to a static file such as /dev/null will cause the token to be signed using a base64-encoded null byte meaning the signature will be valid. 
-							
-	> If the keys are stored in a database, it is possible the kid key becomes a vector for SQL Injection  
+> If the key _kid_ points to a file, it can introduce vulnerabilities such as Directory traversal. You can force the server to use a different file to verify the key. If a symmetric algorithm is used to sign JWTs, this vector is dangerous due to the ability to point to a static file such as /dev/null will cause the modified token to be signed using a base64-encoded null byte meaning the signature will be valid. 
+
+
+> If the keys are stored in a database, it is possible the kid key becomes a vector for SQL Injection  
 					
-What this looks : 
+What this looks like : 
 						
-	- Requirements :
-			+ a generated symmetric key
-			+ a valid JWT token
+Requirements :
+  + a generated symmetric key
+  + a valid JWT token
 											
-	- Exploiting 			
-		- Generate a new symmetic key using the JWT Editor keys. 
-		- Replace the value of the key k with a base64-encoded version of a null byte = (AA==) . 
-		- Attempt a path traversal injection by replacing the key kid with /../../../../../dev/null
-		- Change the necessary values of the token / URL and sign the token
-		- Test the attack vector
+Exploiting 			
+  + Generate a new symmetic key using the JWT Editor keys. 
+  + Replace the value of the key k with a base64-encoded version of a null byte (AA==) . 
+  + Attempt a path traversal injection by replacing the key kid with /../../../../../dev/null
+  + Change the necessary values of the token / URL and sign the token
+  + Test the attack vector
 								 
 								
+
+
+Other Parameters that can be found in headers : https://www.iana.org/assignments/jwt/jwt.xhtml#claims
