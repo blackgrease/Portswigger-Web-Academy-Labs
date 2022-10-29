@@ -57,6 +57,7 @@ Most websites that are secure, will only fetch keys from trusted domains but by 
 						
 	
 What this attack looks like :  
+
 	- Requirements : 
 			+ a server
 			+ a RSA Key
@@ -103,7 +104,7 @@ Why it works : the server does not verrify that my domain is a trusted source. D
 
 ## #Using the kid paramter to inject self-signed JWTs
 
-**Caused by** : _combination of loose paramater constraints (specifications ) and 	developers actions _
+**Caused by** : combination of loose paramater constraints (specifications ) and developers actions 
 
 **Concept**
 					
