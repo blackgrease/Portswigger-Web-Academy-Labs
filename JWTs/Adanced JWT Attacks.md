@@ -1,12 +1,11 @@
 # Algorithm Confusion Attacks --
 
-### Caused by : Improper JWT Library implementation
+**Caused by : Improper JWT Library implementation**	
+
+**Concept** :  This attack exploits assumptions that developers make; that a particular algorithm will be used to verify the signature of a JWT.  We can force a server that handles JWT tokens improperly to verify the signature of a token using another unintended algorithm.
 				
-**Concept** :
-				
-This attack exploits assumptions that developers make; that a particular algorithm will be used to verify the signature of a JWT.  We can force a server that handles JWT tokens improperly to verify the signature of a token using another unintended algorithm.
-				
-Understanding the types of Keys
+Understanding the types of Keys :
+
  > Symmetric :  A single key is used to sign and verify the token. The key needs to be kept secret and not should not be guessable/ brute-forcable. 
    Example of key algorithm : HS256
 						
