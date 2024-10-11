@@ -7,3 +7,5 @@ TO ADD WHEN FREE
   - SSRF
   - GraphQL
   - APIs
+
+**Update:**: I may depreceate this repo in favour of ../Bug-Hunting as its more based on real-live experience. We'll see...
